@@ -1,4 +1,4 @@
-# Mini Product Analytics Engine
+# AI Product Analytics Engine
 
 A lightweight product analytics engine inspired by tools like PostHog.
 
