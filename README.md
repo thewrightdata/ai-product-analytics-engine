@@ -113,3 +113,13 @@ Possible extensions include:
 
 - session replay integration
 - AI-generated SQL queries
+
+---
+
+## Product Design Decisions
+
+This project intentionally uses a warehouse-first architecture.
+
+Rather than building custom analytics logic in application code, events are stored in DuckDB and queried using SQL. This mirrors the approach used by modern analytics platforms where the warehouse becomes the source of truth.
+
+DuckDB was chosen because it allows the entire analytics pipeline to run locally with zero infrastructure.
