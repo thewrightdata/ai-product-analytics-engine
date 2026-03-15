@@ -9,22 +9,22 @@ This project demonstrates how product event data can be ingested, modeled, and q
 ## Quick Start
 
 Clone the repo:
-
+```
 git clone https://github.com/thewrightdata/ai-product-analytics-engine
 cd ai-product-analytics-engine
-
+```
 Install dependencies:
-
+```
 pip install -r requirements.txt
-
+```
 Run analytics:
-
+```
 python run_queries.py
-
+```
 (Optional) Ask natural language questions:
-
+```
 python ai_query.py
-
+```
 ---
 
 ## Problem
@@ -38,13 +38,13 @@ This project explores a minimal architecture for turning raw product events into
 ## Running the project
 
 1. Install dependencies
-
+```
 pip install -r requirements.txt
-
+```
 2. Run the analytics pipeline
-
+```
 python run_queries.py
-
+```
 This will load the event dataset into DuckDB and execute the example analytics queries.
 
 The output includes:
@@ -146,28 +146,16 @@ Example:
 How many users signed up but never created a project?
 
 Run:
-
+```
 python ai_query.py
-
+```
 The system will:
 1. Convert the question into SQL
 2. Execute the query against the event data
 3. Return the result
-
-$ python ai_query.py
-
-Question: How many users signed up but never created a project?
-
-Generated SQL:
-
-SELECT COUNT(DISTINCT user_id)
-FROM events
-WHERE user_id NOT IN (
-    SELECT user_id FROM events WHERE event = 'create_project'
-);
-
 ## Example Output
 
+```
 Running analytics queries...
 
 --- daily_active_users.sql ---
@@ -183,6 +171,39 @@ signups created_project invited_teammates
 --- retention.sql ---
 returning_users
 2
+```
+```
+$ python ai_query.py
+```
+Question: How many users signed up but never created a project?
+
+Generated SQL:
+```
+SELECT COUNT(DISTINCT user_id)
+FROM events
+WHERE user_id NOT IN (
+    SELECT user_id FROM events WHERE event = 'create_project'
+);
+```
+## Example Output
+
+```
+Running analytics queries...
+
+--- daily_active_users.sql ---
+day        daily_active_users
+2025-01-01 3
+2025-01-02 3
+2025-01-03 1
+
+--- funnel.sql ---
+signups created_project invited_teammates
+4       2               1
+
+--- retention.sql ---
+returning_users
+2
+```
 
 ---
 
