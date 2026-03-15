@@ -166,8 +166,12 @@ WHERE user_id NOT IN (
     SELECT user_id FROM events WHERE event = 'create_project'
 );
 
-Result:
-2
+## Example Output
+
+Daily Active Users
+
+2025-01-01 | 3
+2025-01-02 | 4
 
 ---
 
