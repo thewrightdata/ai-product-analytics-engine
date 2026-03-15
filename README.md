@@ -177,8 +177,6 @@ Daily Active Users
 
 ## Product Design Decisions
 
-## Design Choices
-
 DuckDB was chosen as the analytics engine because it provides a lightweight, zero-infrastructure warehouse that can run locally.
 
 Analytics logic is stored in SQL files rather than Python to mirror how modern data teams organize transformation layers.
