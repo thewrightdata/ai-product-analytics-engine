@@ -1,0 +1,10 @@
+user_id,event,timestamp
+1,signup,2025-01-01
+1,create_project,2025-01-02
+1,invite_teammate,2025-01-03
+2,signup,2025-01-01
+2,view_dashboard,2025-01-02
+3,signup,2025-01-01
+3,create_project,2025-01-01
+4,signup,2025-01-02
+4,view_dashboard,2025-01-02
