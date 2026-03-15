@@ -71,5 +71,24 @@ Possible extensions include:
 
 - streaming event ingestion
 - retention cohort analysis
+
+- ## System Architecture
+
+           Product Events
+                 │
+                 ▼
+             events.csv
+                 │
+                 ▼
+               DuckDB
+           (analytics warehouse)
+                 │
+                 ▼
+             SQL Queries
+         (funnels, DAU, activation)
+                 │
+                 ▼
+        Insights / Product Metrics
+
 - session replay integration
 - AI-generated SQL queries
