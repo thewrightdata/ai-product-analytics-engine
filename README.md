@@ -173,8 +173,10 @@ Result:
 
 ## Product Design Decisions
 
-This project intentionally uses a warehouse-first architecture.
+## Design Choices
 
-Rather than building custom analytics logic in application code, events are stored in DuckDB and queried using SQL. This mirrors the approach used by modern analytics platforms where the warehouse becomes the source of truth.
+DuckDB was chosen as the analytics engine because it provides a lightweight, zero-infrastructure warehouse that can run locally.
 
-DuckDB was chosen because it allows the entire analytics pipeline to run locally with zero infrastructure.
+Analytics logic is stored in SQL files rather than Python to mirror how modern data teams organize transformation layers.
+
+This structure allows queries to evolve independently of application logic.
