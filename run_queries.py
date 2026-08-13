@@ -1,60 +1,31 @@
 """
-Mini product analytics runner.
-
-Loads event data into DuckDB and executes all SQL queries in the analytics
-directory. This mirrors a simplified warehouse-first analytics workflow.
+CLI entry point: runs the example analytics queries against data/events.csv
+and prints the results. See README.md for expected output.
 """
 
-import duckdb
-import pandas as pd
-from pathlib import Path
-import sys
-
-DATA_FILE = Path("data/events.csv")
-ANALYTICS_DIR = Path("analytics")
-
-def load_events():
-    if not DATA_FILE.exists():
-        print(f"Error: dataset not found at {DATA_FILE}")
-        sys.exit(1)
-
-    try:
-        df = pd.read_csv(DATA_FILE)
-        return df
-    except Exception as e:
-        print(f"Failed to load dataset: {e}")
-        sys.exit(1)
+from analytics import (
+    load_events,
+    get_connection,
+    daily_active_users,
+    activation_funnel,
+)
 
 
-def run_queries():
-    if not ANALYTICS_DIR.exists():
-        print("Error: analytics directory not found.")
-        sys.exit(1)
+def main():
+    print("Running analytics queries...\n")
 
-    con = duckdb.connect("analytics.db")
+    events_df = load_events()
+    con = get_connection(events_df)
 
-    df = load_events()
-    con.execute("CREATE OR REPLACE TABLE events AS SELECT * FROM df")
+    print("--- daily_active_users.sql ---")
+    print(daily_active_users(con).to_string(index=False))
 
-    sql_files = list(ANALYTICS_DIR.glob("*.sql"))
-
-    if not sql_files:
-        print("No SQL queries found in analytics folder.")
-        return
-
-    print("\nRunning analytics queries...\n")
-
-    for sql_file in sql_files:
-        print(f"--- {sql_file.name} ---")
-
-        try:
-            query = sql_file.read_text()
-            result = con.execute(query).fetchdf()
-            print(result)
-            print()
-        except Exception as e:
-            print(f"Query failed: {e}\n")
+    print("\n--- funnel.sql ---")
+    funnel = activation_funnel(con)
+    print(f"signups={funnel['signups']}  "
+          f"created_project={funnel['created_project']}  "
+          f"invited_teammates={funnel['invited_teammates']}")
 
 
 if __name__ == "__main__":
-    run_queries()
+    main()

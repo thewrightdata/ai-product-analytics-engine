@@ -1,3 +1,4 @@
-duckdb
-pandas
-openai
+duckdb>=1.0.0,<2.0.0
+pandas>=2.0.0,<3.0.0
+openai>=1.30.0,<2.0.0
+pytest>=8.0.0,<9.0.0
