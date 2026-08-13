@@ -1,4 +1,0 @@
-SELECT
-    COUNT(DISTINCT CASE WHEN event='create_project' THEN user_id END) * 1.0 /
-    COUNT(DISTINCT CASE WHEN event='signup' THEN user_id END) as activation_rate
-FROM events;
