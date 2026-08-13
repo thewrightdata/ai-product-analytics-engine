@@ -1,216 +1,176 @@
 # AI Product Analytics Engine
-
+ 
 A lightweight product analytics engine inspired by tools like PostHog.
-
-This project demonstrates how product event data can be ingested, modeled, and queried to answer common product questions.
-
+ 
+This project demonstrates how product event data can be ingested, modeled, and queried to answer common product questions — using a minimal, warehouse-first architecture instead of a full analytics platform.
+ 
 ---
-
+ 
 ## Quick Start
-
+ 
 Clone the repo:
+ 
 ```
 git clone https://github.com/thewrightdata/ai-product-analytics-engine
 cd ai-product-analytics-engine
 ```
+ 
 Install dependencies:
+ 
 ```
 pip install -r requirements.txt
 ```
+ 
 Run analytics:
+ 
 ```
 python run_queries.py
 ```
+ 
 (Optional) Ask natural language questions:
+ 
 ```
 python ai_query.py
 ```
+ 
 ---
-
+ 
 ## Problem
-
-Most SaaS products generate large volumes of behavioral event data but lack a simple way to analyze it without a full analytics platform.
-
+ 
+Most SaaS products generate large volumes of behavioral event data but lack a simple way to analyze it without standing up a full analytics platform.
+ 
 This project explores a minimal architecture for turning raw product events into actionable insights.
-
+ 
 ---
-
-## Running the project
-
-1. Install dependencies
-```
-pip install -r requirements.txt
-```
-2. Run the analytics pipeline
-```
-python run_queries.py
-```
-This will load the event dataset into DuckDB and execute the example analytics queries.
-
-The output includes:
-- Daily active users
-- Activation funnel
-- Activation rate
-
----
-
+ 
 ## Architecture
-
-Event data → DuckDB warehouse → SQL analytics layer → AI query interface
-
-The goal is to show how a small set of components can support common product analytics workflows.
-
+ 
+```
+   Product Events
+         │
+         ▼
+     events.csv
+         │
+         ▼
+       DuckDB
+   (analytics warehouse)
+         │
+         ▼
+     SQL Queries
+ (funnels, DAU, activation)
+         │
+         ▼
+Insights / Product Metrics
+         │
+         ▼
+  AI Query Interface (natural language → SQL)
+```
+ 
+Event data flows into a DuckDB warehouse, gets modeled with a SQL analytics layer, and can be queried either directly (via the example SQL files) or through a natural-language interface.
+ 
 ---
-
+ 
 ## Data Model
-
+ 
 The system operates on a simple event table:
-
-events
-
-user_id  
-event  
-timestamp  
-
-Each row represents a user performing an action inside a product.
-
-Example events include:
-
-- signup
-- create_project
-- invite_teammate
-- view_dashboard
-
+ 
+| Column     | Description                          |
+|------------|---------------------------------------|
+| user_id    | Unique identifier for the user        |
+| event      | Name of the action performed          |
+| timestamp  | When the event occurred               |
+ 
+Each row represents a user performing an action inside a product. Example events include:
+ 
+- `signup`
+- `create_project`
+- `invite_teammate`
+- `view_dashboard`
 ---
-
+ 
 ## Example Analytics
-
+ 
 The repository includes example SQL queries for:
-
-Daily active users  
-Activation funnels  
-Activation rate
-
-These queries demonstrate how product behavior can be analyzed using a warehouse-first approach.
-
----
-
-## Example Product Questions
-
-How many users signed up this week?
-
-How many users created a project after signing up?
-
-What percentage of users activate?
-
----
-
-## Future Improvements
-
-Possible extensions include:
-
-- streaming event ingestion
-- retention cohort analysis
-
----
-
-- ## System Architecture
-
-           Product Events
-                 │
-                 ▼
-             events.csv
-                 │
-                 ▼
-               DuckDB
-           (analytics warehouse)
-                 │
-                 ▼
-             SQL Queries
-         (funnels, DAU, activation)
-                 │
-                 ▼
-        Insights / Product Metrics
-
-- session replay integration
-- AI-generated SQL queries
-
----
-
-## AI Query Interface
-
-You can ask questions about the product data using natural language.
-
-Example:
-
-How many users signed up but never created a project?
-
-Run:
-```
-python ai_query.py
-```
-The system will:
-1. Convert the question into SQL
-2. Execute the query against the event data
-3. Return the result
-## Example Output
-
+ 
+- **Daily active users**
+- **Activation funnels**
+- **Activation rate**
+These queries demonstrate how product behavior can be analyzed using a warehouse-first approach — logic lives in SQL files rather than application code, so it can evolve independently of the app.
+ 
+### Example product questions these answer
+ 
+- How many users signed up this week?
+- How many users created a project after signing up?
+- What percentage of users activate?
+### Example output
+ 
 ```
 Running analytics queries...
-
+ 
 --- daily_active_users.sql ---
 day        daily_active_users
 2025-01-01 3
 2025-01-02 3
 2025-01-03 1
-
+ 
 --- funnel.sql ---
 signups created_project invited_teammates
 4       2               1
-
+ 
 --- retention.sql ---
 returning_users
 2
 ```
+ 
+---
+ 
+## AI Query Interface
+ 
+You can also ask questions about the product data in natural language:
+ 
 ```
-$ python ai_query.py
+python ai_query.py
 ```
-Question: How many users signed up but never created a project?
-
-Generated SQL:
-```
+ 
+**Example:**
+ 
+> Question: How many users signed up but never created a project?
+ 
+The system converts the question into SQL, executes it against the event data, and returns the result.
+ 
+Generated SQL for the example above:
+ 
+```sql
 SELECT COUNT(DISTINCT user_id)
 FROM events
 WHERE user_id NOT IN (
     SELECT user_id FROM events WHERE event = 'create_project'
 );
 ```
-## Example Output
-
-```
-Running analytics queries...
-
---- daily_active_users.sql ---
-day        daily_active_users
-2025-01-01 3
-2025-01-02 3
-2025-01-03 1
-
---- funnel.sql ---
-signups created_project invited_teammates
-4       2               1
-
---- retention.sql ---
-returning_users
-2
-```
-
+ 
 ---
-
-## Product Design Decisions
-
-DuckDB was chosen as the analytics engine because it provides a lightweight, zero-infrastructure warehouse that can run locally.
-
-Analytics logic is stored in SQL files rather than Python to mirror how modern data teams organize transformation layers.
-
-This structure allows queries to evolve independently of application logic.
+ 
+## Product & Engineering Design Decisions
+ 
+- **DuckDB** was chosen as the analytics engine because it provides a lightweight, zero-infrastructure warehouse that runs entirely locally — no cluster or external service required to demo the concept.
+- **Analytics logic lives in SQL files, not Python**, to mirror how modern data teams organize transformation layers (e.g. dbt-style separation of transformation from application logic). This lets queries evolve independently of the app.
+- **Sample dataset is intentionally small.** The included `events.csv` is illustrative, not a production-scale dataset — it's sized to make the pipeline easy to read and verify end-to-end, not to demonstrate performance at scale.
+---
+ 
+## Known Limitations & Next Steps
+ 
+This is a prototype, and the following are the gaps I'd address before treating it as production-ready:
+ 
+- **No automated tests yet.** Next step: row-count and schema validation checks on `events`, plus expected-output assertions on the example SQL queries, so regressions in the metrics logic get caught automatically.
+- **No CI pipeline.** Next step: run the test suite above on every push via GitHub Actions.
+- **Single flat event table.** Next step: normalize into a proper dimensional model (e.g. separate `users` and `events` tables) as the schema grows.
+### Other future extensions
+ 
+- Streaming event ingestion
+- Retention cohort analysis
+- Session replay integration
+---
+ 
+## License
+ 
+MIT
